@@ -1,0 +1,8 @@
+#!/bin/bash
+for arg in "$@"; do
+  if [ "$arg" = "--version" ] || [ "$arg" = "-V" ]; then
+    echo "Cuda compilation tools, release 12.8, V12.8.0"
+    exit 0
+  fi
+done
+exec "/usr/local/cuda-13.1/bin/nvcc" "$@"
