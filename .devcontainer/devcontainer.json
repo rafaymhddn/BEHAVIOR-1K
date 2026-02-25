@@ -1,0 +1,84 @@
+{
+  // ---------------------------------------------------------------------------
+  // Identity
+  // ---------------------------------------------------------------------------
+  // "name": "BEHAVIOR-1K (NGC PyTorch 25.12)",
+  "name": "BEHAVIOR-1K (behaviour:latest)",
+  "containerName": "rafdaymhddn/behaviour-dev",
+
+
+  // ---------------------------------------------------------------------------
+  // Default user inside the container
+  // ---------------------------------------------------------------------------
+  "remoteUser": "ubuntu",
+
+  // ---------------------------------------------------------------------------
+  // Build configuration
+  // ---------------------------------------------------------------------------
+  //dockerFile": "Dockerfile",
+  "image": "rafaymhddn/behaviour:env",
+
+  // ---------------------------------------------------------------------------
+  // One-time init on the host before container starts (X11 auth file)
+  // ---------------------------------------------------------------------------
+  "initializeCommand": "bash -c 'test -f \"$HOME/.Xauthority\" || touch \"$HOME/.Xauthority\"'",
+
+  // ---------------------------------------------------------------------------
+  // Workspace mount location inside the container
+  // .devcontainer lives inside BEHAVIOR-1K/, but ${localWorkspaceFolder}
+  // resolves to the parent "simulator/" folder, so append /BEHAVIOR-1K.
+  // ---------------------------------------------------------------------------
+  "workspaceFolder": "/workspaces/BEHAVIOR-1K",
+  "workspaceMount": "source=${localWorkspaceFolder}/BEHAVIOR-1K,target=/workspaces/BEHAVIOR-1K,type=bind,consistency=cached",
+
+  // ---------------------------------------------------------------------------
+  // Container environment
+  // - X11 forwarding (DISPLAY/XAUTHORITY)
+  // - NVIDIA runtime passthrough (NVIDIA_* env vars)
+  // - Runtime dir (XDG_RUNTIME_DIR) to silence Vulkan warnings
+  // ---------------------------------------------------------------------------
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY:-:0}",
+    "XAUTHORITY": "/home/ubuntu/.Xauthority",
+    "NVIDIA_VISIBLE_DEVICES": "all",
+    "NVIDIA_DRIVER_CAPABILITIES": "all",
+    "OMNIGIBSON_GPU_ID": "0",
+    "OMNIGIBSON_DISABLE_RTX_DENOISER": "1",
+    "OMNIGIBSON_DISABLE_DLSS": "1",
+    "OMNIGIBSON_RENDERER": "HydraStorm",
+    "OMNIGIBSON_DISABLE_OPTIX_PLUGIN": "1"
+  },
+
+  // ---------------------------------------------------------------------------
+  // Docker run args (GPU, IPC, networking, devices, and X11 auth mount)
+  // ------------------------------------------------------------ ---------------
+  "runArgs": [
+    "--gpus=all",
+    "--ipc=host",
+    "--network=host",
+    "--group-add=993",
+    "--group-add=44",
+    "--device-cgroup-rule=c 195:* rmw",
+    "--device-cgroup-rule=c 510:* rmw",
+    "--device-cgroup-rule=c 226:* rmw",
+    "--volume=${localEnv:HOME}/.Xauthority:/home/ubuntu/.Xauthority:ro"
+  ],
+
+  // ---------------------------------------------------------------------------
+  // VS Code settings & extensions for this workspace
+  // ---------------------------------------------------------------------------
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "charliermarsh.ruff"
+      ]
+    }
+  }
+}
+
+
